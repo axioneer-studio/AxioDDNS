@@ -469,6 +469,17 @@ class InfomaniakDDNSClient:
         # 1. Obtenir l'IP publique
         public_ip = self._get_public_ip(ip_version)
         if not public_ip:
+            # IPv6 non détectée par aucun service de détection -> ignoré proprement
+            if ip_version == IPVersion.IPV6:
+                logger.info(
+                    "Aucune IPv6 publique détectée, %s ignoré", ip_version
+                )
+                self.metrics.record_skip()
+                return UpdateResult(
+                    status=UpdateStatus.SKIPPED,
+                    ip_version=ip_version,
+                    message="Aucune IPv6 publique détectée",
+                )
             logger.warning("Impossible d'obtenir l'IP publique %s", ip_version)
             return UpdateResult(
                 status=UpdateStatus.ERROR,
@@ -552,6 +563,8 @@ class InfomaniakDDNSClient:
             self.metrics.record_success(result.ip_version, result.ip_address or "")
         elif result.status == UpdateStatus.ERROR:
             self.metrics.record_failure(result.message)
+        elif result.status == UpdateStatus.SKIPPED:
+            self.metrics.record_skip()
 
     def _interruptible_sleep(self, seconds: int) -> None:
         """Attente interruptible par le flag _running."""
