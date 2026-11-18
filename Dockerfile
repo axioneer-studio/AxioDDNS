@@ -33,8 +33,10 @@ LABEL org.opencontainers.image.title="Infomaniak DDNS Updater" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.version="2.0.0"
 
-# Certificats CA pour les requêtes HTTPS
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+# Certificats CA pour les requêtes HTTPS + procps pour pgrep (healthcheck)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Utilisateur non-root
