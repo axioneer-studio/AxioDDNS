@@ -48,5 +48,9 @@ COPY --from=builder /build/target/release/axioddns /usr/local/bin/axioddns
 
 USER ddns
 
+# Healthcheck - vérifie que le processus Rust tourne
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+    CMD pgrep -f "axioddns" > /dev/null || exit 1
+
 # Point d'entrée
 ENTRYPOINT ["/usr/local/bin/axioddns"]
