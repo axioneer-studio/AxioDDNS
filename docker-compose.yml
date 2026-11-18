@@ -3,10 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ddns-infomaniak
+    container_name: axioddns
     restart: unless-stopped
     env_file:
       - .env
-    environment:
-      PYTHONUNBUFFERED: "1"
     network_mode: host
